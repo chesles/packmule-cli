@@ -1,0 +1,38 @@
+{
+  "name": "@packmule/cli",
+  "version": "1.0.0",
+  "description": "simple native web app release control",
+  "main": "packmule-cli.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "standard"
+  },
+  "bin": {
+    "packmule": "packmule-cli.js"
+  },
+  "author": "John Chesley <john@chesl.es>",
+  "dependencies": {
+    "async": "^0.9.0",
+    "aws-sdk": "^2.1.26",
+    "chalk": "^1.0.0",
+    "find-root": "^0.1.1",
+    "fstream-ignore": "^1.0.2",
+    "lodash.assign": "^3.1.0",
+    "lodash.defaults": "^3.1.1",
+    "lodash.pick": "^3.1.0",
+    "pretty-bytes": "^1.0.4",
+    "request": "^2.57.0",
+    "s3": "^4.4.0",
+    "st": "^0.5.4",
+    "tar": "^2.1.1",
+    "through2": "^0.6.5",
+    "yargs": "^3.8.0"
+  },
+  "devDependencies": {
+    "standard": "^3.7.3",
+    "tape": "^4.0.0"
+  },
+  "license": "MIT"
+}
