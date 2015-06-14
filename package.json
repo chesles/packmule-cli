@@ -23,6 +23,7 @@
     "lodash.defaults": "^3.1.1",
     "lodash.pick": "^3.1.0",
     "pretty-bytes": "^1.0.4",
+    "progress": "^1.1.8",
     "request": "^2.57.0",
     "s3": "^4.4.0",
     "st": "^0.5.4",

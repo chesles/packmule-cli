@@ -16,10 +16,11 @@ module.exports = function () {
         if (err) {
           return done(err)
         }
+        file.stat = stat
 
-        stats.size += stat.size
         if (!stat.isDirectory()) {
           stats.files += 1
+          stats.size += stat.size
         } else {
           stats.directories += 1
         }

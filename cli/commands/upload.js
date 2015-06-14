@@ -1,4 +1,5 @@
 var through = require('through2')
+var ProgressBar = require('progress')
 
 function getStorage (config) {
   var storage_backend = null
@@ -46,7 +47,19 @@ module.exports = function () {
           packmule.stats.humanSize,
           packmule.config.storage
         )
-        storage.upload(storage_conf, {}, end)
+        var progress = new ProgressBar('uploading [:bar] :percent :current', {
+          total: packmule.stats.size,
+        })
+
+        var callbacks = {
+          progress: function (bytes) {
+            progress.tick(bytes)
+          },
+          done: function (err) {
+            end(err)
+          }
+        }
+        storage.upload(storage_conf, {}, callbacks)
       })
     } else {
       end()

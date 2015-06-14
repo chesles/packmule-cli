@@ -1,6 +1,6 @@
 module.exports = {
   config: function (packmule) {
-    return {}
+    return { files: packmule.files }
   },
 
   check: function (config) {
@@ -11,7 +11,12 @@ module.exports = {
     done(null, false)
   },
 
-  upload: function (config, options, done) {
-    done(null)
+  upload: function (config, options, callbacks) {
+    config.files.forEach(function (file) {
+      if (file.stat.isFile()) {
+        callbacks.progress(file.stat.size)
+      }
+    })
+    callbacks.done()
   }
 }

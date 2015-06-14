@@ -41,46 +41,41 @@ module.exports = {
     })
   },
 
-  upload: function (config, options, upload_done) {
+  upload: function (config, options, callbacks) {
     async.each(config.files, function (file, done) {
       var base_path = path.relative(config.source, file.path)
       var bucket_path = [config.path, config.release, base_path].join('/')
 
-      fs.stat(file.path, function (err, stat) {
-        if (err) {
-          return done(err)
-        }
-        if (stat.isDirectory()) {
-          return done()
-        }
-        if (stat.size === 0) {
-          return done()
-        }
+      if (file.stat.isDirectory()) {
+        return done()
+      }
+      if (file.stat.size === 0) {
+        return done()
+      }
 
-        var params = {
-          Bucket: config.bucket,
-          Key: bucket_path,
-          Body: fs.createReadStream(file.path),
-          ContentType: 'text/plain',
-          ACL: 'public-read',
-        }
-        if (file.ContentType) {
-          params.ContentType = file.ContentType
-        }
-        if (file.ContentEncoding) {
-          params.ContentEncoding = file.ContentEncoding
-        }
-        var upload = config.s3.upload(params)
-        upload.on('httpUploadProgress', function (progress) {
-          console.log('-> progress for %s:', file.path, progress)
-        })
-        upload.send(done)
+      var params = {
+        Bucket: config.bucket,
+        Key: bucket_path,
+        Body: fs.createReadStream(file.path),
+        ContentType: 'text/plain',
+        ACL: 'public-read',
+      }
+      if (file.ContentType) {
+        params.ContentType = file.ContentType
+      }
+      if (file.ContentEncoding) {
+        params.ContentEncoding = file.ContentEncoding
+      }
+      var upload = config.s3.upload(params)
+      upload.on('httpUploadProgress', function (progress) {
+        callbacks.progress(progress.loaded)
       })
+      upload.send(done)
     }, function (err) {
       if (err) {
         console.warn('-> upload failed', err)
       }
-      upload_done(err)
+      callbacks.done(err)
     })
   }
 }
