@@ -7,7 +7,7 @@
     "doc": "doc"
   },
   "scripts": {
-    "test": "standard"
+    "test": "standard && tape test/**/*.js"
   },
   "bin": {
     "packmule": "packmule-cli.js"

@@ -58,7 +58,7 @@ module.exports = {
         Key: bucket_path,
         Body: fs.createReadStream(file.path),
         ContentType: 'text/plain',
-        ACL: 'public-read',
+        ACL: 'public-read'
       }
       if (file.ContentType) {
         params.ContentType = file.ContentType

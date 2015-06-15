@@ -48,7 +48,7 @@ module.exports = function () {
           packmule.config.storage
         )
         var progress = new ProgressBar('uploading [:bar] :percent :current', {
-          total: packmule.stats.size,
+          total: packmule.stats.size
         })
 
         var callbacks = {

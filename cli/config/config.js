@@ -17,33 +17,37 @@ function getConf (file) {
 
 module.exports = function () {
   return through.obj(function (packmule, enc, done) {
+    var defaults = packmule.defaults
     var packmule_json = getConf('packmule.json')
     var pkg_json = getConf('package.json')
 
-    packmule.config = assign(
+    var config = packmule.config = assign(
       {},
-      packmule.defaults.config,
+      defaults.config,
       pkg_json,
       packmule_json,
-      pick(packmule.opts, Object.keys(packmule.defaults.config))
+      pick(packmule.args, Object.keys(defaults.config))
     )
 
     packmule.options = assign(
       {},
-      packmule.defaults.options,
-      pick(packmule.opts, Object.keys(packmule.defaults.options))
+      defaults.options,
+      pick(packmule.args, Object.keys(defaults.options))
     )
 
-    var channels = [].concat(packmule.opts.channel || []).concat(packmule.opts.c || [])
-    packmule.config.channels = channels
-    packmule.config.port = Number(packmule.config.port || packmule.defaults.config.port)
+    if ('channels' in defaults.config) {
+      config.channels = [].concat(packmule.args.channel || []).concat(packmule.args.c || [])
+    }
+    if (config.port && typeof config.port !== 'number') {
+      config.port = Number(config.port)
+    }
 
     // get the first non-option argument,
     // else check for '--version',
     // default to 'release'
     packmule.command = packmule.argv && packmule.argv.length
       ? packmule.argv[0]
-      : packmule.opts.version ? 'version' : packmule.defaults.command
+      : packmule.args.version ? 'version' : packmule.defaults.command
 
     if (packmule.argv.length > 1) {
       packmule.config.source = packmule.argv[1]

@@ -2,7 +2,6 @@ var through = require('through2')
 
 // set the content type for files that may or may not be gzipped
 function getType (path) {
-
   if (/\.txt(\.gz)?$/.test(path)) {
     return 'text/plain'
   }
@@ -21,11 +20,9 @@ function getType (path) {
   if (/\.svg(\.gz)?$/.test(path)) {
     return 'image/svg+xml'
   }
-
 }
 
 function getEncoding (path) {
-  // gzipped files get Content-Encoding: gzip
   if (/\.gz$/.test(path)) {
     return 'gzip'
   }

@@ -34,7 +34,7 @@ module.exports = function () {
         command: 'serve'
       },
       argv: argv,
-      opts: args
+      args: args
     })
   })
 }
