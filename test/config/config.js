@@ -73,5 +73,4 @@ test('no configuration files', function (t) {
       argv: ['my_command', 'some_folder']
     })
   })
-
 })
