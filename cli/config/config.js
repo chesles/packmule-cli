@@ -1,5 +1,5 @@
 var through = require('through2')
-var assign = require('lodash.assign')
+var defaults = require('lodash.defaults')
 var pick = require('lodash.pick')
 var findRoot = require('find-root')
 var path = require('path')
@@ -17,25 +17,24 @@ function getConf (file) {
 
 module.exports = function () {
   return through.obj(function (packmule, enc, done) {
-    var defaults = packmule.defaults
     var packmule_json = getConf('packmule.json')
     var pkg_json = getConf('package.json')
 
-    var config = packmule.config = assign(
+    var config = packmule.config = defaults(
       {},
-      defaults.config,
+      pick(packmule.args, Object.keys(packmule.defaults.config)),
       pkg_json,
       packmule_json,
-      pick(packmule.args, Object.keys(defaults.config))
+      packmule.defaults.config
     )
 
-    packmule.options = assign(
+    packmule.options = defaults(
       {},
-      defaults.options,
-      pick(packmule.args, Object.keys(defaults.options))
+      pick(packmule.args, Object.keys(packmule.defaults.options)),
+      packmule.defaults.options
     )
 
-    if ('channels' in defaults.config) {
+    if ('channels' in packmule.defaults.config) {
       config.channels = [].concat(packmule.args.channel || []).concat(packmule.args.c || [])
     }
     if (config.port && typeof config.port !== 'number') {
@@ -48,6 +47,13 @@ module.exports = function () {
     packmule.command = packmule.argv && packmule.argv.length
       ? packmule.argv[0]
       : packmule.args.version ? 'version' : packmule.defaults.command
+
+    // process command-specific option defaults
+    Object.keys(config).forEach(function (key) {
+      if (typeof config[key] === 'function') {
+        config[key] = config[key](packmule.command)
+      }
+    })
 
     if (packmule.argv.length > 1) {
       packmule.config.source = packmule.argv[1]

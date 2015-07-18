@@ -1,8 +1,7 @@
 var through = require('through2')
 
-var cli = module.exports = through.obj()
-
 var pipes = [
+  './config/arg-parse',
   './config/defaults',
   './config/config',
   './config/whitelist-commands',
@@ -18,11 +17,20 @@ var pipes = [
   './commands/serve'
 ]
 
-pipes.reduce(function (prev, path) {
-  var factory = require(path)
-  var stream = prev.pipe(factory(prev))
-  stream.on('error', function (err) {
-    cli.emit('error', err)
-  })
-  return stream
-}, cli)
+function cli (options) {
+  var cli = through.obj()
+
+  pipes.reduce(function (prev, path) {
+    var factory = require(path)
+    var stream = prev.pipe(factory(prev))
+    stream.on('error', function (err) {
+      cli.emit('error', err)
+    })
+    return stream
+  }, cli)
+
+  cli.end(options)
+  return cli
+}
+
+module.exports = cli

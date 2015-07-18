@@ -4,14 +4,35 @@ function unix_timestamp () {
   return Math.round(Date.now() / 1000).toString()
 }
 
+/*
+ * most options have a simple default value we can set directly in the
+ * defaults object. a few depend on which command is being called, and those
+ * defaults are configured here
+ */
+function command_default (option, _default) {
+  var command_defaults = {
+    serve: {
+      release: 'dev',
+      host: 'localhost'
+    }
+  }
+
+  return function (command) {
+    if (command in command_defaults) {
+      return command_defaults[command][option] || _default
+    }
+    return _default
+  }
+}
+
 module.exports = function () {
   return through.obj(function (args, enc, done) {
     var config = {
-      host: 'localhost',
+      host: command_default('host', 'localhost'),
       port: 6462,
       path: 'releases',
       package: '',
-      release: unix_timestamp(),
+      release: command_default('release', unix_timestamp()),
       channels: [],
       storage: 's3',
       endpoint: '',

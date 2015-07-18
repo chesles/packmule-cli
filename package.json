@@ -20,7 +20,7 @@
     "find-root": "^0.1.1",
     "fstream-ignore": "^1.0.2",
     "lodash.assign": "^3.1.0",
-    "lodash.defaults": "^3.1.1",
+    "lodash.defaults": "^3.1.2",
     "lodash.pick": "^3.1.0",
     "pretty-bytes": "^1.0.4",
     "progress": "^1.1.8",

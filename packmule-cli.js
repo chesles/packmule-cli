@@ -1,18 +1,10 @@
 #!/usr/bin/env node
 
-var argv = require('yargs')
-  .options({
-    verbose: { alias: 'v' },
-    port: { alias: 'p' }
-  })
-  .boolean(['force', 'skip-upload', 'verbose', 'version'])
-  .argv
+var packmule = require('./cli')
 
-var cli = require('./cli')
+var cli = packmule(process.argv)
 
 cli.on('error', function (err) {
   console.warn('Error:', err.message)
   process.exit(1)
 })
-
-cli.end(argv)
