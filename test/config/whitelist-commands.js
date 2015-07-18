@@ -35,8 +35,7 @@ test('whitelist', function (t) {
     })
     stream.pipe(tests)
     stream.on('error', function (err) {
-      console.warn(err)
-      t.ok(true, 'should throw an error')
+      t.ok(true, 'should throw an error: ' + (err && err.message))
     })
 
     stream.write({ command: 'yelp' })

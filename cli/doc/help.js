@@ -18,8 +18,8 @@ Commands:
     url             Print the URL a release will be at
     version         Show current version
 
-General Options: (defaults in parens)
-    -v, --verbose   Be chatty (false)
+General Options:
+    -v, --verbose   Be chatty (default=false)
         --version   Show current version
 
 Command Options:
@@ -30,11 +30,13 @@ Command Options:
         --path      path releases can be found at on the server (default=/releases/)
         --package   name of the package (default=package.json "name" field)
     -p, --port      port where releases can be found or to serve local releases on (default=6462)
-    -r, --release   name/number of the release (default=current UNIX timestamp)
+    -r, --release   name of the release (default=current UNIX timestamp)
         --storage   backend storage to upload files to (default=s3)
 
   serve
+    -h, --host      host to listen on (default=localhost)
     -p, --port      port to listen on (default=6462)
+    -r, --release   name of the release to serve (default=dev)
 
   url
 

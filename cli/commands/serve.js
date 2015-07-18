@@ -1,10 +1,11 @@
 var through = require('through2')
 var http = require('http')
 var path = require('path')
+var fs = require('fs')
 var st = require('st')
 var chalk = require('chalk')
 
-function log (req, res) {
+function log_request (req, res) {
   console.log('[%s] %s %s',
     chalk.yellow((new Date()).toUTCString()),
     chalk.cyan(req.method),
@@ -14,7 +15,7 @@ function log (req, res) {
 
 module.exports = function () {
   return through.obj(function (packmule, enc, done) {
-    var server, static_mount, static_files
+    var server, mount_path, static_files, ok_file
     var sockets = {}
 
     function log_listen () {
@@ -27,26 +28,43 @@ module.exports = function () {
         chalk.yellow('Server started, serving'),
         chalk.cyan(packmule.config.source),
         chalk.yellow('at'),
-        chalk.cyan(host + ':' + addr.port + static_mount)
+        chalk.cyan(host + ':' + addr.port + mount_path)
       )
     }
-
-    if (packmule.command === 'serve') {
-      static_mount = path.normalize(['', packmule.config.path, packmule.config.release, ''].join('/'))
-      static_files = st({
-        path: packmule.config.source,
-        url: static_mount,
-        cache: false
-      })
-
-      server = http.createServer(function (req, res) {
-        log(req, res)
-        res.setHeader('Access-Control-Allow-Origin', '*')
-        static_files(req, res, function () {
+    function handle_request (req, res) {
+      function catchall () {
+        var ok = fs.createReadStream(ok_file)
+        ok.on('error', function (err) {
+          console.warn(err)
           res.writeHead(404, 'Not found')
           res.end('Not found')
         })
+        ok.pipe(res)
+      }
+
+      log_request(req, res)
+      res.setHeader('Access-Control-Allow-Origin', '*')
+      static_files(req, res, catchall)
+    }
+
+    if (packmule.command === 'serve') {
+
+      mount_path = [
+        '',
+        packmule.config.path,
+        packmule.config.release,
+        ''
+      ].join('/')
+      mount_path = path.normalize(mount_path)
+
+      static_files = st({
+        path: packmule.config.source,
+        url: mount_path,
+        cache: false
       })
+      ok_file = path.join(packmule.config.source, '200.html')
+
+      server = http.createServer(handle_request)
       server.on('error', function (err) {
         return end(err)
       })
@@ -64,7 +82,7 @@ module.exports = function () {
         end()
       })
 
-      server.listen(packmule.config.port, log_listen)
+      server.listen(packmule.config.port, packmule.config.host, log_listen)
 
     } else {
       return end()
