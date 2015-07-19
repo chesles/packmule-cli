@@ -3,8 +3,9 @@ var defaults = require('lodash.defaults')
 var pick = require('lodash.pick')
 var findRoot = require('find-root')
 var path = require('path')
+var whitelist = require('./whitelist-commands')
 
-function getConf (file) {
+function get_conf (file) {
   var config
   var root = findRoot(process.cwd())
   var conf_file = path.join(root, file)
@@ -15,10 +16,59 @@ function getConf (file) {
   return config
 }
 
+function convert_port (port) {
+  return port && typeof port !== 'number'
+    ? Number(port)
+    : port
+}
+
+function get_channels(packmule) {
+  return [].concat(packmule.args.channel || [])
+    .concat(packmule.args.c || [])
+}
+
+function get_command(packmule) {
+  var argc = packmule.argv.length
+  var command = packmule.argv && argc > 0
+    ? packmule.argv[0]
+    : packmule.args.version ? 'version' : packmule.defaults.command
+
+  // if only 1 arg and it's not a valid command, assume it's the source
+  if (argc === 1 && whitelist.commands.indexOf(command) < 0) {
+    command = packmule.defaults.command
+  }
+
+  return command
+}
+
+function get_source (packmule) {
+  var argc = packmule.argv.length
+  var default_source = packmule.defaults.config.source
+  var source = argc > 0
+    ? packmule.argv[argc - 1]
+    : default_source
+
+  // if only 1 arg and it is a valid command, assume source is cwd
+  if (argc === 1 && whitelist.commands.indexOf(source) >= 0) {
+    source = default_source
+  }
+
+  return source
+}
+
+function configure_command (packmule) {
+  // process command-specific option defaults
+  Object.keys(packmule.config).forEach(function (key) {
+    if (typeof packmule.config[key] === 'function') {
+      packmule.config[key] = packmule.config[key](packmule.command)
+    }
+  })
+}
+
 module.exports = function () {
   return through.obj(function (packmule, enc, done) {
-    var packmule_json = getConf('packmule.json')
-    var pkg_json = getConf('package.json')
+    var packmule_json = get_conf('packmule.json')
+    var pkg_json = get_conf('package.json')
 
     var config = packmule.config = defaults(
       {},
@@ -35,29 +85,13 @@ module.exports = function () {
     )
 
     if ('channels' in packmule.defaults.config) {
-      config.channels = [].concat(packmule.args.channel || []).concat(packmule.args.c || [])
+      config.channels = get_channels(packmule)
     }
-    if (config.port && typeof config.port !== 'number') {
-      config.port = Number(config.port)
-    }
+    config.port = convert_port(config.port)
+    packmule.command = get_command(packmule)
+    configure_command(packmule)
 
-    // get the first non-option argument,
-    // else check for '--version',
-    // default to 'release'
-    packmule.command = packmule.argv && packmule.argv.length
-      ? packmule.argv[0]
-      : packmule.args.version ? 'version' : packmule.defaults.command
-
-    // process command-specific option defaults
-    Object.keys(config).forEach(function (key) {
-      if (typeof config[key] === 'function') {
-        config[key] = config[key](packmule.command)
-      }
-    })
-
-    if (packmule.argv.length > 1) {
-      packmule.config.source = packmule.argv[1]
-    }
+    packmule.config.source = get_source(packmule)
 
     done(null, packmule)
   })

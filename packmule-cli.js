@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 
-var packmule = require('./cli')
+var packmule = module.exports = require('./cli')
 
-var cli = packmule(process.argv)
+if (process.mainModule === module) {
+  var cli = packmule(process.argv.splice(2))
 
-cli.on('error', function (err) {
-  console.warn('Error:', err.message)
-  process.exit(1)
-})
+  cli.on('error', function (err) {
+    console.warn('Error:', err.message)
+    process.exit(1)
+  })
+}
