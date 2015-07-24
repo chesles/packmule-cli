@@ -10,7 +10,7 @@ function get_conf (file) {
   var root = findRoot(process.cwd())
   var conf_file = path.join(root, file)
   try {
-    config = require(conf_file).packmule || {}
+    config = require(conf_file) || {}
   } catch (e) {
   }
   return config
@@ -22,12 +22,11 @@ function convert_port (port) {
     : port
 }
 
-function get_channels(packmule) {
+function get_channels (packmule) {
   return [].concat(packmule.args.channel || [])
-    .concat(packmule.args.c || [])
 }
 
-function get_command(packmule) {
+function get_command (packmule) {
   var argc = packmule.argv.length
   var command = packmule.argv && argc > 0
     ? packmule.argv[0]
@@ -56,11 +55,18 @@ function get_source (packmule) {
   return source
 }
 
+function get_package (packmule) {
+  return (packmule.config.package === '')
+    ? path.basename(packmule.config.source)
+    : packmule.config.package
+}
+
 function configure_command (packmule) {
   // process command-specific option defaults
   Object.keys(packmule.config).forEach(function (key) {
-    if (typeof packmule.config[key] === 'function') {
-      packmule.config[key] = packmule.config[key](packmule.command)
+    var val = packmule.config[key]
+    if (typeof val === 'function') {
+      packmule.config[key] = val(packmule.command)
     }
   })
 }
@@ -73,10 +79,11 @@ module.exports = function () {
     var config = packmule.config = defaults(
       {},
       pick(packmule.args, Object.keys(packmule.defaults.config)),
-      pkg_json,
+      pkg_json.packmule,
       packmule_json,
       packmule.defaults.config
     )
+    config.package = config.package || pkg_json.name || ''
 
     packmule.options = defaults(
       {},
@@ -92,6 +99,7 @@ module.exports = function () {
     configure_command(packmule)
 
     packmule.config.source = get_source(packmule)
+    packmule.config.package = get_package(packmule)
 
     done(null, packmule)
   })

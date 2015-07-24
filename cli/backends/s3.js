@@ -6,7 +6,7 @@ var fs = require('fs')
 module.exports = {
   config: function (packmule) {
     return {
-      bucket: packmule.opts.bucket,
+      bucket: packmule.args.bucket,
       path: packmule.config.path.replace(/^\//, ''),
       release: packmule.config.release,
       source: packmule.config.source,

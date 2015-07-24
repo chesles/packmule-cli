@@ -8,7 +8,11 @@ test('no configuration files', function (t) {
     stream.pipe(
       through.obj(function (data, enc, done) {
         t.ok(data.config, 'should define a config object')
-        t.deepEqual(Object.keys(data.config), ['key1', 'key2'], 'should not add any config keys that have no default')
+        t.deepEqual(
+          Object.keys(data.config),
+          ['package', 'host', 'source', 'port', 'key1', 'key2'],
+          'should not add any config keys that have no default'
+        )
         t.ok(data.options, 'should define an options object')
         t.deepEqual(Object.keys(data.options), ['option1', 'option2'], 'should not add any option keys that have no default')
         t.equal(data.command, 'foo', 'should keep the default command')
@@ -19,6 +23,10 @@ test('no configuration files', function (t) {
     stream.end({
       defaults: {
         config: {
+          package: 'test',
+          host: 'localhost',
+          source: './test',
+          port: '8080',
           key1: 'value1',
           key2: 'value2'
         },
@@ -38,7 +46,7 @@ test('no configuration files', function (t) {
     stream.pipe(
       through.obj(function (data, enc, done) {
         t.ok(data.config, 'should define a config object')
-        t.deepEqual(data.config.channels, ['a', 'b', 'c'], 'should concat all channel sources')
+        t.deepEqual(data.config.channels, ['a', 'b', 'c'], 'should include all channels')
         t.strictEqual(data.config.port, 1234, 'should convert string number to an integer')
         t.equal(data.config.some_setting, 'default value', 'should leave default config values alone if not specified')
 
@@ -65,8 +73,7 @@ test('no configuration files', function (t) {
       },
       args: {
         port: '1234',
-        channel: ['a', 'b'],
-        c: 'c',
+        channel: ['a', 'b', 'c'],
         force: true,
         'skip-upload': true
       },

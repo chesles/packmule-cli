@@ -10,12 +10,19 @@ module.exports = function () {
         package: packmule.config.package,
         release: packmule.config.release,
         channels: packmule.config.channels,
+        host: packmule.config.host,
+        port: packmule.config.port,
+        path: packmule.config.path,
         metadata: {
           stats: packmule.stats,
           git: packmule.git
         }
       }
-      request.post(endpoint, { json: payload }, end)
+      var headers = { }
+      if (packmule.config.token) {
+        headers['Authorization'] = 'Token token=' + packmule.config.token
+      }
+      request.post(endpoint, { json: payload, headers: headers }, end)
     } else {
       end()
     }
