@@ -32,6 +32,7 @@
     "yargs": "^3.8.0"
   },
   "devDependencies": {
+    "sinon": "^1.15.4",
     "standard": "^3.7.3",
     "tape": "^4.0.0"
   },

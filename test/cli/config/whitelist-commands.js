@@ -1,6 +1,6 @@
 var test = require('tape')
 var through = require('through2')
-var whitelist = require('../../cli/config/whitelist-commands')
+var whitelist = require('../../../cli/config/whitelist-commands')
 
 test('whitelist', function (t) {
   t.test('known commands', function (t) {

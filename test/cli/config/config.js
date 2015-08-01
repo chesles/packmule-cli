@@ -1,8 +1,8 @@
 var test = require('tape')
 var through = require('through2')
-var config = require('../../cli/config/config')
+var config = require('../../../cli/config/config')
 
-test('no configuration files', function (t) {
+test('config', function (t) {
   t.test('no custom options', function (t) {
     var stream = config()
     stream.pipe(

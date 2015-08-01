@@ -1,6 +1,6 @@
 var test = require('tape')
 var through = require('through2')
-var defaults = require('../../cli/config/defaults')
+var defaults = require('../../../cli/config/defaults')
 
 test('defaults', function (t) {
   var stream = defaults()
