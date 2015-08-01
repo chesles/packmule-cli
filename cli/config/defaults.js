@@ -14,6 +14,9 @@ function command_default (option, _default) {
     serve: {
       release: 'dev',
       host: 'localhost'
+    },
+    url: {
+      port: null
     }
   }
 
@@ -29,7 +32,7 @@ module.exports = function () {
   return through.obj(function (args, enc, done) {
     var config = {
       host: command_default('host', 'localhost'),
-      port: 6462,
+      port: command_default('port', 6462),
       path: 'releases',
       package: '',
       release: command_default('release', unix_timestamp()),
