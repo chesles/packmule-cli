@@ -13,8 +13,8 @@ module.exports = function () {
     .boolean(['force', 'skip-upload', 'verbose', 'version'])
     .argv
 
-    // translate --help into 'help'
-    if (args.help) {
+    // translate --help or just -h into 'help'
+    if (args.help || (args._.length === 0 && args.h === true)) {
       args._.push('help')
     }
     done(null, args)
