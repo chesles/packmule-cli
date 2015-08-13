@@ -94,10 +94,10 @@ module.exports = function () {
     if ('channels' in packmule.defaults.config) {
       config.channels = get_channels(packmule)
     }
-    config.port = convert_port(config.port)
     packmule.command = get_command(packmule)
     configure_command(packmule)
 
+    packmule.config.port = convert_port(packmule.config.port)
     packmule.config.source = get_source(packmule)
     packmule.config.package = get_package(packmule)
 

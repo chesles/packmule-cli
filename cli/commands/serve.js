@@ -6,11 +6,20 @@ var st = require('st')
 var chalk = require('chalk')
 
 function log_request (req, res) {
-  console.log('[%s] %s %s',
-    chalk.yellow((new Date()).toUTCString()),
-    chalk.cyan(req.method),
-    chalk.blue(req.url)
-  )
+  res.on('finish', function () {
+    console.log('[%s] %s %s',
+      chalk.yellow((new Date()).toUTCString()),
+      color_code(res.statusCode),
+      chalk.cyan(req.method),
+      chalk.blue(req.url)
+    )
+  })
+}
+
+function color_code (code) {
+  if (code < 300) return chalk.green(code)
+  if (code < 400) return chalk.yellow(code)
+  else return chalk.red(code)
 }
 
 module.exports = function () {
@@ -35,9 +44,14 @@ module.exports = function () {
       function catchall () {
         var ok = fs.createReadStream(ok_file)
         ok.on('error', function (err) {
-          console.warn(err)
-          res.writeHead(404, 'Not found')
-          res.end('Not found')
+          if (err.code === 'ENOENT') {
+            res.writeHead(404, 'Not found')
+            res.end('Not found')
+          } else {
+            console.warn(err)
+            res.writeHead(500, 'Server error')
+            res.end('Server error')
+          }
         })
         ok.pipe(res)
       }
@@ -48,7 +62,6 @@ module.exports = function () {
     }
 
     if (packmule.command === 'serve') {
-
       mount_path = [
         '',
         packmule.config.path,
@@ -68,6 +81,8 @@ module.exports = function () {
       server.on('error', function (err) {
         return end(err)
       })
+
+      // track all open sockets so we can close them later on SIGINT
       server.on('connection', function (sock) {
         sockets[sock.remotePort] = sock
         sock.on('close', function () { delete sockets[sock.remotePort] })
