@@ -59,7 +59,7 @@ module.exports = function () {
             end(err)
           }
         }
-        storage.upload(storage_conf, {}, callbacks)
+        storage.upload(packmule.files, storage_conf, {}, callbacks)
       })
     } else {
       end()

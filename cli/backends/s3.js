@@ -10,7 +10,6 @@ module.exports = {
       path: packmule.config.path.replace(/^\//, ''),
       release: packmule.config.release,
       source: packmule.config.source,
-      files: packmule.files,
       s3: new aws.S3()
     }
   },
@@ -41,8 +40,8 @@ module.exports = {
     })
   },
 
-  upload: function (config, options, callbacks) {
-    async.each(config.files, function (file, done) {
+  upload: function (files, config, options, callbacks) {
+    async.each(files, function (file, done) {
       var base_path = path.relative(config.source, file.path)
       var bucket_path = [config.path, config.release, base_path].join('/')
 
