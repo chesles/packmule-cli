@@ -6,6 +6,7 @@ var commands = [
   'register',
   'release',
   'serve',
+  'pack',
   'upload',
   'url',
   'version'

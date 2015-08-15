@@ -14,6 +14,7 @@ var pipes = [
   './metadata/stats',
   './commands/info',
   './commands/url',
+  './commands/pack',
   './commands/upload',
   './commands/register',
   './commands/serve'

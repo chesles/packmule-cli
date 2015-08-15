@@ -4,6 +4,7 @@ var path = require('path')
 var fs = require('fs')
 var st = require('st')
 var chalk = require('chalk')
+var pack = require('./pack')
 
 function log_request (req, res) {
   res.on('finish', function () {
@@ -42,7 +43,7 @@ module.exports = function () {
     }
     function handle_request (req, res) {
       function catchall () {
-        var ok = fs.createReadStream(ok_file)
+        var ok = fs.createReadStream(ok_file, 'utf8')
         ok.on('error', function (err) {
           if (err.code === 'ENOENT') {
             res.writeHead(404, 'Not found')
@@ -53,8 +54,13 @@ module.exports = function () {
             res.end('Server error')
           }
         })
-        ok.pipe(res)
+        ok.pipe(res.filter).pipe(res)
       }
+      // pack files served on the fly
+      res.filter = through(function (data, enc, done) {
+        var str = data.toString('utf8')
+        done(null, pack.needs_packed(str) ? pack.pack(str, packmule) : data)
+      })
 
       log_request(req, res)
       res.setHeader('Access-Control-Allow-Origin', '*')
@@ -62,13 +68,12 @@ module.exports = function () {
     }
 
     if (packmule.command === 'serve') {
-      mount_path = [
+      mount_path = path.normalize([
         '',
         packmule.config.path,
         packmule.config.release,
         ''
-      ].join('/')
-      mount_path = path.normalize(mount_path)
+      ].join('/'))
 
       static_files = st({
         path: packmule.config.source,

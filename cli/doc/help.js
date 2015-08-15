@@ -12,8 +12,9 @@ Usage:
 Commands:
     help            Show this message
     info            Display metadata about a directory (files, types, size, etc.)
+    pack            Package files for release
     register        Register a release (without uploading any files)
-    release         Upload and register a new release
+    release         Pack, Upload and register a new release
     serve           Serve up a local release
     upload          Upload files for a release (without registering it)
     url             Print the URL a release will be at
@@ -24,8 +25,10 @@ General Options:
         --version   Show current packmule version
 
 Command Options:
-  release: upload and register a release
+  pack: prepare files for upload (replace PACKMULE_RELEASE with URL of release in all input files)
+  upload: upload files to the specified storage backend
   register: (re)register a release, skipping the upload
+  release: pack, upload and register a release
 
     -c, --channel   name(s) of channels to tag the release on (default=[])
         --endpoint  API endpoint to register releases on
