@@ -2,6 +2,7 @@ var through = require('through2')
 
 var commands = [
   'help',
+  'info',
   'register',
   'release',
   'serve',

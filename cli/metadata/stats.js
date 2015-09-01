@@ -5,7 +5,7 @@ var fs = require('fs')
 
 module.exports = function () {
   return through.obj(function (packmule, enc, done) {
-    var stats = packmule.stats = {
+    var stats = packmule.metadata.stats = {
       files: 0,
       directories: 0,
       size: 0

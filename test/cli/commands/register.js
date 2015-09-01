@@ -22,6 +22,8 @@ test('register', function (t) {
     cb()
   })
 
+  t.plan(10)
+
   stream.pipe(
     through.obj(function (data, enc, done) {
       t.end()
@@ -40,18 +42,19 @@ test('register', function (t) {
       port: 1234,
       path: '/releases/test'
     },
-    stats: {
-      files: 17,
-      directories: 5,
-      size: 12300,
-      humanSize: '12.3 kb'
-    },
-    git: {
-      branch: 'test-branch',
-      commit: 'commit-sha',
-      message: 'commit-message',
-      user_name: 'username',
-      user_email: 'test@example.com'
+    metadata: {
+      stats: {
+        files: 17,
+        directories: 5,
+        size: 12300,
+        humanSize: '12.3 kb'
+      },
+      git: {
+        branch: 'test-branch',
+        commit: 'commit-sha',
+        message: 'commit-message',
+        committer: 'username <test@example.com>'
+      }
     }
   })
 })

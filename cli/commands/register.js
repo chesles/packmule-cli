@@ -13,10 +13,7 @@ module.exports = function () {
         host: packmule.config.host,
         port: packmule.config.port,
         path: packmule.config.path,
-        metadata: {
-          stats: packmule.stats,
-          git: packmule.git
-        }
+        metadata: packmule.metadata
       }
       var headers = { }
       if (packmule.config.token) {

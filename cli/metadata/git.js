@@ -3,20 +3,19 @@ var through = require('through2')
 var async = require('async')
 
 module.exports = function () {
-  return through.obj(function (data, enc, done) {
+  return through.obj(function (packmule, enc, done) {
     async.parallel({
       branch: getOutput('git rev-parse --abbrev-ref HEAD'),
       commit: getOutput('git rev-parse HEAD'),
-      message: getOutput('git log -1 --pretty=%B'),
-      user_name: getOutput('git config user.name'),
-      user_email: getOutput('git config user.email')
+      committer: getOutput('git log -1 --pretty=format:"%an (%ae)"'),
+      message: getOutput('git log -1 --pretty=%B')
     }, end)
 
     function end (err, result) {
       if (result.branch || result.commit || result.message) {
-        data.git = result
+        packmule.metadata.git = result
       }
-      done(err, data)
+      done(err, packmule)
     }
   })
 }

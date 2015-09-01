@@ -11,6 +11,7 @@ Usage:
 
 Commands:
     help            Show this message
+    info            Display metadata about a directory (files, types, size, etc.)
     register        Register a release (without uploading any files)
     release         Upload and register a new release
     serve           Serve up a local release
