@@ -11,8 +11,8 @@ module.exports = {
     done(null, false)
   },
 
-  upload: function (config, options, callbacks) {
-    config.files.forEach(function (file) {
+  upload: function (files, config, options, callbacks) {
+    files.forEach(function (file) {
       if (file.stat.isFile()) {
         callbacks.progress(file.stat.size)
       }

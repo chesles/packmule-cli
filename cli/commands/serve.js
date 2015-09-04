@@ -57,10 +57,7 @@ module.exports = function () {
         ok.pipe(res.filter).pipe(res)
       }
       // pack files served on the fly
-      res.filter = through(function (data, enc, done) {
-        var str = data.toString('utf8')
-        done(null, pack.needs_packed(str) ? pack.pack(str, packmule) : data)
-      })
+      res.filter = pack.getFilter(packmule.release_url)
 
       log_request(req, res)
       res.setHeader('Access-Control-Allow-Origin', '*')

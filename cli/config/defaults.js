@@ -12,11 +12,9 @@ function unix_timestamp () {
 function command_default (option, _default) {
   var command_defaults = {
     serve: {
-      release: 'dev',
-      host: 'localhost'
-    },
-    url: {
-      port: null
+      host: 'localhost',
+      port: 6462,
+      release: 'dev'
     }
   }
 
@@ -32,7 +30,7 @@ module.exports = function () {
   return through.obj(function (args, enc, done) {
     var config = {
       host: command_default('host', 'localhost'),
-      port: command_default('port', 6462),
+      port: command_default('port', null),
       path: 'releases',
       package: '',
       release: command_default('release', unix_timestamp()),

@@ -2,6 +2,7 @@ var async = require('async')
 var aws = require('aws-sdk')
 var path = require('path')
 var fs = require('fs')
+var pack = require('../commands/pack')
 
 module.exports = {
   config: function (packmule) {
@@ -9,6 +10,7 @@ module.exports = {
       bucket: packmule.args.bucket,
       path: packmule.config.path.replace(/^\//, ''),
       release: packmule.config.release,
+      release_url: packmule.release_url,
       source: packmule.config.source,
       s3: new aws.S3()
     }
@@ -51,23 +53,24 @@ module.exports = {
       if (file.stat.size === 0) {
         return done()
       }
+      var stream = fs.createReadStream(file.path).pipe(pack.getFilter(config.release_url))
 
       var params = {
         Bucket: config.bucket,
         Key: bucket_path,
-        Body: fs.createReadStream(file.path),
-        ContentType: 'text/plain',
+        Body: stream,
+        ContentType: file.ContentType || 'text/plain',
         ACL: 'public-read'
-      }
-      if (file.ContentType) {
-        params.ContentType = file.ContentType
       }
       if (file.ContentEncoding) {
         params.ContentEncoding = file.ContentEncoding
       }
       var upload = config.s3.upload(params)
+      var prev = 0
       upload.on('httpUploadProgress', function (progress) {
-        callbacks.progress(progress.loaded)
+        var bytes_uploaded = progress.loaded - prev
+        prev = progress.loaded
+        callbacks.progress(bytes_uploaded)
       })
       upload.send(done)
     }, function (err) {

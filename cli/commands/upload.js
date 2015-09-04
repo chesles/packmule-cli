@@ -32,7 +32,7 @@ module.exports = function () {
         if (err) {
           return end(err)
         } else if (exists) {
-          var message = 'Release ' + packmule.config.release + ' exists.'
+          var message = '-> Release ' + packmule.config.release + ' exists.'
           if (!packmule.options.force) {
             var error = new Error(message + ' Use --force to upload anyway')
             return end(error)
@@ -42,13 +42,13 @@ module.exports = function () {
         }
         console.log('-> Uploading %s: %d files, %d directories (%s) to %s',
           packmule.config.source,
-          packmule.stats.files,
-          packmule.stats.directories,
-          packmule.stats.humanSize,
+          packmule.metadata.stats.files,
+          packmule.metadata.stats.directories,
+          packmule.metadata.stats.humanSize,
           packmule.config.storage
         )
-        var progress = new ProgressBar('uploading [:bar] :percent :current', {
-          total: packmule.stats.size
+        var progress = new ProgressBar('-> [:bar] :percent :current ', {
+          total: packmule.metadata.stats.size
         })
 
         var callbacks = {

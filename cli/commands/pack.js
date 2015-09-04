@@ -7,8 +7,15 @@ function needs_packed (data) {
   return PACK_PATTERN.test(data)
 }
 
-function pack (data, packmule) {
-  return data.replace(PACK_PATTERN, packmule.release_url)
+function pack (data, release_url) {
+  return data.replace(PACK_PATTERN, release_url)
+}
+
+function getFilter (release_url) {
+  return through(function (data, enc, done) {
+    var str = data.toString('utf8')
+    done(null, needs_packed(str) ? pack(str, release_url) : data)
+  })
 }
 
 module.exports = function () {
@@ -17,7 +24,7 @@ module.exports = function () {
       packmule.files.forEach(function (file) {
         var original = fs.readFileSync(file.path, 'utf8')
         if (needs_packed(original)) {
-          var updated = pack(original, packmule)
+          var updated = pack(original, packmule.release_url)
           fs.writeFileSync(file.path, updated, 'utf8')
         }
       })
@@ -26,5 +33,4 @@ module.exports = function () {
   })
 }
 
-module.exports.needs_packed = needs_packed
-module.exports.pack = pack
+module.exports.getFilter = getFilter
