@@ -1,7 +1,7 @@
 var through = require('through2')
 var fs = require('fs')
 
-var PACK_PATTERN = /PACKMULE_RELEASE/g
+var PACK_PATTERN = /PACKMULE_RELEASE|RELEASE_URL/g
 
 function needs_packed (data) {
   return PACK_PATTERN.test(data)
