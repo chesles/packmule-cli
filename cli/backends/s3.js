@@ -2,6 +2,7 @@ var async = require('async')
 var aws = require('aws-sdk')
 var path = require('path')
 var fs = require('fs')
+var zlib = require('zlib')
 var pack = require('../commands/pack')
 
 module.exports = {
@@ -46,6 +47,7 @@ module.exports = {
     async.each(files, function (file, done) {
       var base_path = path.relative(config.source, file.path)
       var bucket_path = [config.path, config.release, base_path].join('/')
+      var gzip = /.gz$/.test(file.path)
 
       if (file.stat.isDirectory()) {
         return done()
@@ -53,7 +55,14 @@ module.exports = {
       if (file.stat.size === 0) {
         return done()
       }
-      var stream = fs.createReadStream(file.path).pipe(pack.getFilter(config.release_url))
+      var stream = fs.createReadStream(file.path)
+      if (gzip) {
+        stream = stream.pipe(zlib.createGunzip())
+      }
+      stream = stream.pipe(pack.getFilter(config.release_url))
+      if (gzip) {
+        stream = stream.pipe(zlib.createGzip())
+      }
 
       var params = {
         Bucket: config.bucket,
