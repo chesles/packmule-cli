@@ -23,8 +23,15 @@ module.exports = function () {
     } else {
       end()
     }
-    function end (err) {
-      return done(err, err ? null : packmule)
+    function end (err, response, body) {
+      if (err) {
+        return done(err)
+      }
+      if (response && response.statusCode >= 400) {
+        err = new Error(body && body.error ? body.error : 'Error registering release')
+        return done(err)
+      }
+      return done(null, packmule)
     }
   })
 }

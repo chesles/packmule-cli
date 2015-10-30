@@ -4,6 +4,33 @@ var through = require('through2')
 var request = require('request')
 var register = require('../../../cli/commands/register')
 
+var release = {
+  command: 'register',
+  config: {
+    token: 'auth-token',
+    endpoint: 'http://localhost/api/register-release',
+    package: 'test-package',
+    release: 'abcd123',
+    channels: ['test'],
+    host: 'localhost',
+    port: 1234,
+    path: '/releases/test'
+  },
+  metadata: {
+    stats: {
+      files: 17,
+      directories: 5,
+      size: 12300,
+      humanSize: '12.3 kb'
+    },
+    git: {
+      branch: 'test-branch',
+      commit: 'commit-sha',
+      message: 'commit-message',
+      committer: 'username <test@example.com>'
+    }
+  }
+}
 test('register', function (t) {
   var stream = register()
 
@@ -30,31 +57,22 @@ test('register', function (t) {
     })
   )
 
-  stream.end({
-    command: 'register',
-    config: {
-      token: 'auth-token',
-      endpoint: 'http://localhost/api/register-release',
-      package: 'test-package',
-      release: 'abcd123',
-      channels: ['test'],
-      host: 'localhost',
-      port: 1234,
-      path: '/releases/test'
-    },
-    metadata: {
-      stats: {
-        files: 17,
-        directories: 5,
-        size: 12300,
-        humanSize: '12.3 kb'
-      },
-      git: {
-        branch: 'test-branch',
-        commit: 'commit-sha',
-        message: 'commit-message',
-        committer: 'username <test@example.com>'
-      }
-    }
+  stream.end(release)
+})
+
+test('registration failure', function (t) {
+  var stream = register()
+  sinon
+    .stub(request, 'post')
+    .yields(null, { statusCode: 401 }, { error: 'Bad API key' })
+
+  stream.on('error', function (err) {
+    t.ok(err, 'should throw an error')
+    t.equal(err.message, 'Bad API key', 'should contain the error details from the response')
+    t.end()
   })
+
+  stream.end(release)
+
+  request.post.restore()
 })
